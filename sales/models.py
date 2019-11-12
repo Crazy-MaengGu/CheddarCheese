@@ -1,6 +1,26 @@
 from django.db import models
+from hr.models import Employee
+from hr.models import Department
+from client.models import Customer, Company
+
 
 # Create your models here.
+
+
+class SalesType(models.Model):
+    sal_type_id = models.AutoField(primary_key=True)
+    sal_type_comt = models.CharField(max_length=200)
+
+    def __str__(self):
+        return '{} {}'.format(self.sal_type_id, self.sal_type_comt)
+
+
+class SalesIndustryType(models.Model):
+    sal_industry_id = models.AutoField(primary_key=True)
+    sal_industry_comt = models.CharField(max_length=200)
+
+    def __str__(self):
+        return '{} {}'.format(self.sal_industry_id, self.sal_industry_comt)
 
 
 class Contract(models.Model):
@@ -37,22 +57,27 @@ class Contract(models.Model):
 
 
 class ContractManager(models.Model):
-    cont_mng_cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='cont_mng_cont_id', primary_key=True)
-    cont_mng_emp_code = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='cont_mng_emp_code', primary_key=True)
+    cont_mng_id = models.AutoField(primary_key=True)
+    cont_mng_cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='cont_mng_cont_id')
+    cont_mng_emp_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='cont_mng_emp_id')
     cont_mng_date = models.DateField()
     cont_mng_sal_price = models.BigIntegerField()
     cont_mng_profit_price = models.BigIntegerField()
     cont_mng_profit_ratio = models.FloatField()
     cont_mng_cust_id = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name='cont_mng_cust_id')
 
+    class Meta:
+        unique_together = (('cont_mng_cont_id', 'cont_mng_emp_id'),)
+
     def __str__(self):
         return 'Contract Mng : {} {}'.format(self.cont_mng_cont_id, self.cont_mng_date)
 
 
 class Revenue(models.Model):
-    reve_cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='reve_cont_id', primary_key=True)
-    reve_emp_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='reve_emp_id', primary_key=True)
     reve_id = models.AutoField(primary_key=True)
+    reve_cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='reve_cont_id')
+    reve_emp_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='reve_emp_id')
+    reve_seq = models.SmallIntegerField()
     reve_price = models.BigIntegerField()
     reve_profit_price = models.BigIntegerField()
     reve_profit_ratio = models.FloatField()
@@ -64,14 +89,18 @@ class Revenue(models.Model):
     reve_comt = models.CharField(max_length=200, null=True, blank=True)
     reve_com_id = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='reve_com_id')
 
+    class Meta:
+        unique_together = (('reve_cont_id', 'reve_emp_id', 'reve_seq'),)
+
     def __str__(self):
-        return 'Revenue {} {} {}'.format(self.reve_cont_id, self.reve_emp_id, self.reve_id)
+        return 'Revenue {} {} {}'.format(self.reve_cont_id, self.reve_emp_id, self.reve_seq)
 
 
 class Purchase(models.Model):
-    purc_cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='purc_cont_id', primary_key=True)
-    purc_emp_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='purc_emp_id', primary_key=True)
     purc_id = models.AutoField(primary_key=True)
+    purc_cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='purc_cont_id')
+    purc_emp_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='purc_emp_id')
+    purc_seq = models.SmallIntegerField()
     purc_price = models.BigIntegerField()
     purc_pred_billing_date = models.DateField(null=True, blank=True)
     purc_billing_date = models.DateField(null=True, blank=True)
@@ -81,42 +110,33 @@ class Purchase(models.Model):
     purc_comt = models.CharField(max_length=200, null=True, blank=True)
     purc_com_id = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='purc_com_id')
 
+    class Meta:
+        unique_together = (('purc_cont_id', 'purc_emp_id', 'purc_seq'),)
+
     def __str__(self):
         return 'Purchase {} {} {}'.format(self.purc_cont_id, self.purc_emp_id, self.purc_id)
-
-
-class SalesType(models.Model):
-    sal_type_id = models.AutoField(primary_key=True)
-    sal_type_comt = models.CharField(max_length=200)
-
-    def __str__(self):
-        return '{} {}'.format(self.sal_type_id, self.sal_type_comt)
-
-
-class SalesIndustryType(models.Model):
-    sal_industry_id = models.AutoField(primary_key=True)
-    sal_industry_comt = models.CharField(max_length=200)
-
-    def __str__(self):
-        return '{} {}'.format(self.sal_industry_id, self.sal_industry_comt)
 
 
 class Category(models.Model):
     cate_id = models.AutoField(primary_key=True)
     cate_comt = models.CharField(max_length=200)
-    cate_depen_id = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='cate_depen_id')
+    cate_depen_id = models.ForeignKey("sales.Category", on_delete=models.PROTECT, related_name='cate_depen_id')
 
     def __str__(self):
         return '{} {}'.format(self.cate_id, self.cate_comt)
 
 
 class ContractItem(models.Model):
-    cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='cont_id', primary_key=True)
-    cont_item_cate_id = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='cont_item_cate_id', primary_key=True)
     cont_item_id = models.AutoField(primary_key=True)
+    cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='cont_id')
+    cont_item_cate_id = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='cont_item_cate_id')
+    cont_item_seq = models.SmallIntegerField()
     cont_item_comt = models.CharField(max_length=200)
     cont_item_num = models.SmallIntegerField()
     cont_item_price = models.BigIntegerField()
+
+    class Meta:
+        unique_together = (('cont_id', 'cont_item_cate_id', 'cont_item_seq'),)
 
     def __str__(self):
         return 'ContractItem {} {} {}'.format(self.cont_id, self.cont_item_cate_id, self.cont_item_id)

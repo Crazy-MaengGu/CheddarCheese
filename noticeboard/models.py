@@ -1,11 +1,14 @@
 from django.db import models
+from hr.models import Employee
+from service.models import ServiceReport
+from client.models import Company
 
 # Create your models here.
 
 class Board(models.Model):
     board_id = models.AutoField(primary_key=True)
     board_title = models.CharField(max_length=200, help_text="제목을 작성해 주세요.")
-    board_details = models.TextField(help_text="상세 내용을 작성해 주세요.")
+    board_det = models.TextField(help_text="상세 내용을 작성해 주세요.")
     board_type = models.CharField(max_length=2)
     board_files = models.FileField(null=True, blank=True, upload_to="board/%Y_%m")
     board_write_date_time = models.DateTimeField()

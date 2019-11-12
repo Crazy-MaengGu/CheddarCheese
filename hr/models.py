@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -15,8 +16,8 @@ class Position(models.Model):
 class Department(models.Model):
     dept_id = models.AutoField(primary_key=True)
     dept_name = models.CharField(max_length=30)
-    dept_depen_id = models.ForeignKey(Department, on_delete=models.SET_NULL, related_name='dept_depen_id', null=True)
-    dept_emp_id = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='dept_emp_id', null=True)
+    dept_depen_id = models.ForeignKey("hr.Department", on_delete=models.SET_NULL, related_name='dept_depen_id', null=True)
+    dept_emp_id = models.ForeignKey("hr.Employee", on_delete=models.SET_NULL, related_name='dept_emp_id', null=True)
 
     def __str__(self):
         return self.dept_name
@@ -50,18 +51,22 @@ class Employee(models.Model):
     emp_vacation_days = models.CharField(max_length=2, default='0')
     emp_type = models.CharField(max_length=2, default='정직원')
     emp_posit_id = models.ForeignKey(Position, on_delete=models.PROTECT, related_name='emp_posit_id')
-    emp_mng = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='emp_mng')
+    emp_mng = models.ForeignKey("hr.Employee", on_delete=models.SET_NULL, related_name='emp_mng')
 
     def __str__(self):
         return self.emp_name
 
 
 class EmployeeHistory(models.Model):
-    emp_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='emp_id', primary_key=True)
-    emp_hist_start_date = models.DateField(primary_key=True)
-    emp_hist_end_date = models.DateField(primary_key=True, default='9999-12-31')
+    emp_hist_id = models.AutoField(primary_key=True)
+    emp_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='emp_id')
+    emp_hist_start_date = models.DateField()
+    emp_hist_end_date = models.DateField(default='9999-12-31')
     emp_hist_type = models.CharField(max_length=2)
     emp_hist_comt = models.CharField(max_length=200, null=True, blank=True)
+
+    class Meta:
+        unique_together = (('emp_id', 'emp_hist_start_date', 'emp_hist_end_date'),)
 
     def __str__(self):
         return 'Employee History : {} {}'.format(self.emp_id, self.emp_hist_start_date)
@@ -90,13 +95,16 @@ class Punctuality(models.Model):
 
 
 class PayHistory(models.Model):
-
+    pay_hist_id = models.AutoField(primary_key=True)
     pay_hist_emp_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='pay_hist_emp_id')
     pay_hist_date = models.DateField()
-    pay_hist_total_price = models.BigIntegerField()
+    pay_hist_tot_price = models.BigIntegerField()
     pay_hist_default_price = models.BigIntegerField()
     pay_hist_etc_price = models.BigIntegerField()
     pay_hist_bouns_price = models.BigIntegerField()
+
+    class Meta:
+        unique_together = (('pay_hist_emp_id', 'pay_hist_date'),)
 
     def __str__(self):
         return 'Pay History : {} {}'.format(self.pay_hist_emp_id, self.pay_hist_date)
