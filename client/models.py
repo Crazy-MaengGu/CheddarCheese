@@ -31,9 +31,6 @@ class Customer(models.Model):
     cust_stat = models.CharField(max_length=1, choices=statusChoices, default='Y')
     cust_com_id = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='cust_com_id')
 
-    class Meta:
-        unique_together = (('cust_name', 'com_name'),)
-
     def __str__(self):
         return self.cust_name
 
@@ -61,7 +58,7 @@ class CompanyInfo(models.Model):
     com_info_attribute_comt = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:
-        unique_together = (('com_id', 'com_info_seq'),)
+        unique_together = (('com_info_com_id', 'com_info_seq'),)
 
     def __str__(self):
         return self.com_info_attribute

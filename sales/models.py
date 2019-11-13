@@ -120,7 +120,7 @@ class Purchase(models.Model):
 class Category(models.Model):
     cate_id = models.AutoField(primary_key=True)
     cate_comt = models.CharField(max_length=200)
-    cate_depen_id = models.ForeignKey("sales.Category", on_delete=models.PROTECT, related_name='cate_depen_id')
+    cate_depen_id = models.ForeignKey("sales.Category", on_delete=models.CASCADE, related_name='cate_dependency_id', null=True)
 
     def __str__(self):
         return '{} {}'.format(self.cate_id, self.cate_comt)
@@ -128,7 +128,7 @@ class Category(models.Model):
 
 class ContractItem(models.Model):
     cont_item_id = models.AutoField(primary_key=True)
-    cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='cont_id')
+    cont_item_cont_id = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='cont_item_cont_id')
     cont_item_cate_id = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='cont_item_cate_id')
     cont_item_seq = models.SmallIntegerField()
     cont_item_comt = models.CharField(max_length=200)
@@ -136,7 +136,7 @@ class ContractItem(models.Model):
     cont_item_price = models.BigIntegerField()
 
     class Meta:
-        unique_together = (('cont_id', 'cont_item_cate_id', 'cont_item_seq'),)
+        unique_together = (('cont_item_cont_id', 'cont_item_cate_id', 'cont_item_seq'),)
 
     def __str__(self):
         return 'ContractItem {} {} {}'.format(self.cont_id, self.cont_item_cate_id, self.cont_item_id)

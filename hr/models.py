@@ -16,7 +16,7 @@ class Position(models.Model):
 class Department(models.Model):
     dept_id = models.AutoField(primary_key=True)
     dept_name = models.CharField(max_length=30)
-    dept_depen_id = models.ForeignKey("hr.Department", on_delete=models.SET_NULL, related_name='dept_depen_id', null=True)
+    dept_depen_id = models.ForeignKey("hr.Department", on_delete=models.SET_NULL, related_name='dept_dependency_id', null=True)
     dept_emp_id = models.ForeignKey("hr.Employee", on_delete=models.SET_NULL, related_name='dept_emp_id', null=True)
 
     def __str__(self):
@@ -51,7 +51,7 @@ class Employee(models.Model):
     emp_vacation_days = models.CharField(max_length=2, default='0')
     emp_type = models.CharField(max_length=2, default='정직원')
     emp_posit_id = models.ForeignKey(Position, on_delete=models.PROTECT, related_name='emp_posit_id')
-    emp_mng = models.ForeignKey("hr.Employee", on_delete=models.SET_NULL, related_name='emp_mng')
+    emp_mng = models.ForeignKey("hr.Employee", on_delete=models.SET_NULL, related_name='emp_mng_emp_id', null=True)
 
     def __str__(self):
         return self.emp_name
@@ -59,14 +59,14 @@ class Employee(models.Model):
 
 class EmployeeHistory(models.Model):
     emp_hist_id = models.AutoField(primary_key=True)
-    emp_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='emp_id')
+    emp_hist_emp_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='emp_hist_emp_id')
     emp_hist_start_date = models.DateField()
     emp_hist_end_date = models.DateField(default='9999-12-31')
     emp_hist_type = models.CharField(max_length=2)
     emp_hist_comt = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:
-        unique_together = (('emp_id', 'emp_hist_start_date', 'emp_hist_end_date'),)
+        unique_together = (('emp_hist_emp_id', 'emp_hist_start_date', 'emp_hist_end_date'),)
 
     def __str__(self):
         return 'Employee History : {} {}'.format(self.emp_id, self.emp_hist_start_date)

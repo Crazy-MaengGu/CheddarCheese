@@ -49,7 +49,7 @@ class ServiceReport(models.Model):
     srv_emp_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='srv_emp_id')
     srv_com_id = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='srv_com_id')
     srv_cust_id = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True, related_name='srv_cust_id')
-    srv_type_id = models.ForeignKey(ServiceType, on_delete=models.SET_NULL, related_name='srv_type_id')
+    srv_srvtype_id = models.ForeignKey(ServiceType, on_delete=models.PROTECT, related_name='srv_srvtype_id')
     srv_cont_id = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, blank=True, related_name='srv_cont_id')
 
     def __str__(self):
