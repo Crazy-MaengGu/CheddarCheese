@@ -10,23 +10,22 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-import os
+from os.path import dirname, abspath, join
+from CheddarCheese.security import SECRET_KEY
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ')_zd-%reu8@-fo_l^)srsi)kq7zih!k*om@at_k3-j9rdqi%4v'
+SECRET_KEY = SECRET_KEY
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = '*'
 
+INTERNAL_IPS = ["127.0.0.1"]
 
 # Application definition
 
@@ -63,8 +62,7 @@ ROOT_URLCONF = 'CheddarCheese.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,10 +82,20 @@ WSGI_APPLICATION = 'CheddarCheese.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'sqlite3': {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': join(BASE_DIR, 'db.sqlite3'),
+        }
+    },
+    'mysql': {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'django',
+            'USER': 'django',
+            'PASSWORD': 'django',
+        }
+    },
 }
 
 
@@ -119,13 +127,25 @@ TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
 
-USE_TZ = True
+USE_TZ = False
 
+DATE_FORMAT = "Y.m.d"
+
+SESSION_COOKIE_AGE = 7200
+SESSION_SAVE_EVERY_REQUEST = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = join(BASE_DIR, 'static')
+
+LOGIN_REDIRECT_URL = '/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = join(BASE_DIR, 'media')
+
+# post data limit(The number of GET/POST parameters exceeded)
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
