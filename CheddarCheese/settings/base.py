@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'dashboard',
     'signature',
     'sales',
+    'administrator',
 ]
 
 MIDDLEWARE = [

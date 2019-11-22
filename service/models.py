@@ -108,6 +108,42 @@ class ServiceWorker(models.Model):
         return 'SrviceWorker : {} {}'.format(self.worker_srv_id, self.worker_emp_name)
 
 
+class ServiceForm(models.Model):
+    serviceTypeChoices = (
+        ('교육', '교육'),
+        ('마이그레이션', '마이그레이션'),
+        ('모니터링', '모니터링'),
+        ('미팅&회의', '미팅&회의'),
+        ('백업&복구', '백업&복구'),
+        ('프로젝트상주', '프로젝트상주'),
+        ('상주', '상주'),
+        ('설치&패치', '설치&패치'),
+        ('원격지원', '원격지원'),
+        ('일반작업지원', '일반작업지원'),
+        ('장애지원', '장애지원'),
+        ('정기점검', '정기점검'),
+        ('튜닝', '튜닝'),
+        ('프로젝트', '프로젝트'),
+        ('프리세일즈', '프리세일즈'),
+    )
+    serviceLocationChoices = (('서울', '서울'), ('경기', '경기'), ('기타', '기타'))
+    statusChoices = (('N', 'N'), ('B', 'B'), ('S', 'S'), ('E', 'E'), ('Y', 'Y'))
+
+    srv_form_id = models.AutoField(primary_key=True)
+    srv_form_emp_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='srv_form_emp_id')
+    srv_form_com_id = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='srv_form_com_id')
+    srv_form_srvtype_id = models.ForeignKey(ServiceType, on_delete=models.PROTECT, related_name='srv_form_srvtype_id')
+    srv_form_start_datetime = models.DateTimeField()
+    srv_form_end_datetime = models.DateTimeField()
+    srv_form_location = models.CharField(max_length=10, choices=serviceLocationChoices, default='서울')
+    srv_form_directgo = models.CharField(max_length=1, choices=statusChoices, default='N')
+    srv_form_title = models.CharField(max_length=200, help_text="제목을 작성해 주세요.")
+    srv_form_det = models.TextField(help_text="상세 내용을 작성해 주세요.")
+
+    def __str__(self):
+        return 'ServiceForm : {} {}'.format(self.srv_form_emp_id, self.srv_form_com_id)
+
+
 class Vacation(models.Model):
     vac_id = models.AutoField(primary_key=True)
     vac_emp_id = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name='vac_emp_id')
